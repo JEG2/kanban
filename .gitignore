@@ -53,3 +53,7 @@ erl_crash.dump
 kanban-*.tar
 /priv/static/assets/
 /priv/static/cache_manifest.json
+
+# Dialyzer files
+/priv/plts/*.plt
+/priv/plts/*.plt.hash
