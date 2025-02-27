@@ -6,6 +6,8 @@ ARG RUNNER_IMG="debian:${DEB_VSN}"
 
 FROM ${BUILDER_IMG} AS builder
 
+ENV ERL_FLAGS="+JPperf true"
+
 WORKDIR /app
 COPY mix.exs mix.lock ./
 

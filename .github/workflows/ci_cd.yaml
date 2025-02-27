@@ -1,6 +1,9 @@
 name: CI/CD Elixir
 on:
   push:
+    branches: [main]
+  pull_request:
+    branches: [main]
   workflow_dispatch:
 jobs:
   ci:
@@ -76,10 +79,16 @@ jobs:
       - name: Parse versions from .tool-versions
         id: parse-asdf
         run: ./scripts/versions.sh
+      - uses: docker/setup-buildx-action@v3
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
       - uses: docker/build-push-action@v5
         with:
           context: .
+          cache-from: type=registry,ref=ghcr.io/JEG2/kanban:cache
+          cache-to: type=registry,ref=ghcr.io/JEG2/kanban:cache,mode=max
           tags: ${{ steps.meta.outputs.tags }}
+          platforms: linux/amd64,linux/arm64
           labels: ${{ steps.meta.outputs.labels }}
           push: true
           build-args: |
