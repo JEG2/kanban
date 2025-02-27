@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
 jobs:
   ci:
-    runs-on: ubuntu24
+    runs-on: ubuntu-latest
     name: Compile
     env:
       MIX_ENV: test
