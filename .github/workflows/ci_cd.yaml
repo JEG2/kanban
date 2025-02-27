@@ -4,16 +4,16 @@ on:
   workflow_dispatch:
 jobs:
   ci:
-    runs-on: ubuntu22
+    runs-on: ubuntu24
     name: Compile
     env:
       MIX_ENV: test
     steps:
       - uses: actions/checkout@v4
       - name: Setup Elixir
-        uses: erlef/setup-beam@v1.17.3
+        uses: erlef/setup-beam@v1.18.2
         env:
-          ImageOS: ubuntu22
+          ImageOS: ubuntu24
         with:
           version-file: .tool-versions
           version-type: strict
