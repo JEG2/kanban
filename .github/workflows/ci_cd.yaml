@@ -7,11 +7,10 @@ on:
   workflow_dispatch:
 jobs:
   ci:
-    runs-on: ubuntu-latest
     name: Compile with mix test, format, and Dialyzer
     env:
       MIX_ENV: test
-      ImageOS: ubuntu22
+      ImageOS: ubuntu24
     steps:
       - uses: actions/checkout@v4
       - name: Setup Elixir
@@ -54,10 +53,9 @@ jobs:
       - name: Check unused dependencies
         run: mix deps.unlock --check-unused
   build-push:
-    runs-on: ubuntu-latest
     needs: ci
     env:
-      ImageOS: ubuntu22
+      ImageOS: ubuntu24
     name: Build Docker image & push to ghcr.io
     steps:
       - uses: actions/checkout@v4
