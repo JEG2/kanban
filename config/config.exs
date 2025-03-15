@@ -5,9 +5,17 @@
 # is restricted to this project.
 
 # General application configuration
+# This file is responsible for configuring your application
+# and its dependencies with the aid of the Config module.
+#
+# This configuration file is loaded before any dependency and
+# is restricted to this project.
+
+# General application configuration
 import Config
 
 config :kanban,
+  ecto_repos: [Kanban.Repo],
   generators: [timestamp_type: :utc_datetime]
 
 # Configures the endpoint
@@ -19,7 +27,7 @@ config :kanban, KanbanWeb.Endpoint,
     layout: false
   ],
   pubsub_server: Kanban.PubSub,
-  live_view: [signing_salt: "LHkV2Eok"]
+  live_view: [signing_salt: "+fbekJ40"]
 
 # Configures the mailer
 #
