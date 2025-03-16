@@ -57,3 +57,10 @@ kanban-*.tar
 # Dialyzer files
 /priv/plts/*.plt
 /priv/plts/*.plt.hash
+
+# Packer files
+packer_cache/
+crash.log
+*.pkrvars.hcl
+*.box
+**/*.pem
