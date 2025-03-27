@@ -71,6 +71,8 @@ jobs:
     env:
       ImageOS: ubuntu24
     name: Build Docker image & push to ghcr.io
+    outputs:
+      unique_docker_tag: ${{ steps.get-unique-docker-tag.outputs.sha_tag }}
     steps:
       - uses: actions/checkout@v4
       - name: Login to GHCR
@@ -107,3 +109,30 @@ jobs:
           build-args: |
             ELIXIR_VERSION=${{ env.ELIXIR_VERSION }}
             OTP_VERSION=${{ env.ERLANG_VERSION }}
+      - name: Gets unique image tag
+        id: get-unique-docker-tag
+        if: github.ref == 'refs/heads/main'
+        run: |-
+          IMAGE_TAG=$(echo "${{ steps.meta.outputs.tags }}" \
+          | grep 'sha' \
+          | tr '\n' ' ' \
+          | awk '{print $1}')
+          echo "sha_tag=$IMAGE_TAG" >> $GITHUB_OUTPUT
+  deploy:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    env:
+      ImageOS: ubuntu24
+    needs: build-push
+    name: Deploy application
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/deploy
+        with:
+          github_user: ${{ github.repository_owner }}
+          gh_pat: ${{ secrets.GH_PAT }}
+          aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          age_key: ${{ secrets.AGE_KEY }}
+          ssh_private_key: ${{ secrets.PRIVATE_KEY }}
+          image_tag: ${{ needs.build-push.outputs.unique_docker_tag }}

@@ -30,7 +30,7 @@ fi
 
 # set default variables
 IMAGE=${1:-"ghcr.io/jeg2/kanban:latest"}
-AWS_REGION="eu-west-1"
+AWS_REGION="us-west-1"
 INSTANCE_TAG_NAME="docker-swarm-manager"
 STACK_NAME="kanban"
 # get EC2 IP address
