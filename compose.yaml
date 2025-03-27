@@ -1,6 +1,8 @@
 services:
   db:
     image: postgres:17.4
+    secrets:
+      - postgrespassword
     healthcheck:
       test: ["CMD", "pg_isready", "--username=postgres"]
       interval: 10s
@@ -10,13 +12,16 @@ services:
       restart_policy:
         condition: on-failure
     environment:
-      POSTGRES_PASSWORD: postgres
+      POSTGRES_PASSWORD_FILE: /run/secrets/postgrespassword
     ports:
       - ${POSTGRES_PORT:-5432}
     volumes:
       - db_data:/var/lib/postgresql/data
   web:
-    image: ${WEB_IMAGE:-ghcr.io/beamops/kanban:latest}
+    image: ${WEB_IMAGE:-ghcr.io/jeg2/kanban:latest}
+    secrets:
+      - databaseurl
+      - secretkeybase
     deploy:
       restart_policy:
         condition: on-failure
@@ -24,8 +29,8 @@ services:
         max_attempts: 3
         window: 120s
     environment:
-      DATABASE_URL: ecto://postgres:postgres@db/postgres
-      SECRET_KEY_BASE: UzSU+EZ/xkIMaGAqWP68CeIDIJWr83fQvUqHzxZka2LnTSkYKzaLy5A3nJUdZLfs
+      DATABASE_URL_FILE: /run/secrets/databaseurl
+      SECRET_KEY_BASE_FILE: /run/secrets/secretkeybase
       PHX_HOST: "localhost"
     ports:
       - 4000:4000
@@ -35,3 +40,11 @@ services:
       bash -c "bin/migrate && bin/server"
 volumes:
   db_data:
+
+secrets:
+  postgrespassword:
+    file: ./secrets/.postgrespassword
+  databaseurl:
+    file: ./secrets/.databaseurl
+  secretkeybase:
+    file: ./secrets/.secretkeybase
