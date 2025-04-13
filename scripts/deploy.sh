@@ -33,10 +33,13 @@ IMAGE=${1:-"ghcr.io/jeg2/kanban:latest"}
 AWS_REGION="us-west-1"
 INSTANCE_TAG_NAME="docker-swarm-manager"
 STACK_NAME="kanban"
+COMPOSE_FILE_PATH=${COMPOSE_FILE_PATH:-"compose.yaml"}
+
 # get EC2 IP address
 MANAGER_IP=$(aws ec2 describe-instances \
                  --filters "Name=tag:Name,Values=$INSTANCE_TAG_NAME" \
                  "Name=instance-state-name,Values=running" \
+                 "Name=tag:SwarmReady,Values=true" \
                  --query "Reservations[0].Instances[0].PublicIpAddress" \
                  --region "$AWS_REGION" --output text)
 
@@ -64,6 +67,7 @@ echo "$GITHUB_TOKEN" | docker login ghcr.io \
 # deploy the application
 DOCKER_HOST="ssh://ec2-user@$MANAGER_IP" \
            WEB_IMAGE="$IMAGE" \
-           docker stack deploy -c compose.yaml --with-registry-auth "$STACK_NAME"
+           docker stack deploy -c "$COMPOSE_FILE_PATH" \
+           --with-registry-auth "$STACK_NAME"
 
 echo "Deployment completed."

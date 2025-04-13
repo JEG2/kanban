@@ -23,6 +23,7 @@ services:
       - databaseurl
       - secretkeybase
     deploy:
+      replicas: ${WEB_REPLICAS:-1}
       restart_policy:
         condition: on-failure
         delay: 5s

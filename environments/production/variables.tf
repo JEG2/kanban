@@ -20,3 +20,8 @@ variable "gh_pat" {
   type = string
   sensitive = true
 }
+
+variable "account_id" {
+  type = string
+  description = "AWS account ID"
+}
