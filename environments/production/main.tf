@@ -1,6 +1,14 @@
 module "swarm" {
-  source           = "../../modules/cloud/aws/compute/swarm"
+  source = "../../modules/cloud/aws/compute/swarm"
   private_key_path = "${path.module}/private_key.pem"
+  account_id = var.account_id
+  age_key_path = "${path.module}/key.txt"
+  compose_file = "../../compose.yaml"
+  aws_access_key_id = var.aws_access_key_id
+  aws_secret_access_key = var.aws_secret_access_key
+  gh_pat = var.gh_pat
+  gh_owner = "jeg2"
+  image_to_deploy = "ghcr.io/jeg2/kanban:latest"
 }
 
 module "repository_secrets" {
@@ -26,5 +34,5 @@ module "contributing_workflow" {
 }
 
 output "swarm_ssh_command" {
-  value = module.swarm.ssh_command
+  value = module.swarm.ssh_commands
 }
