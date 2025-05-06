@@ -20,12 +20,7 @@ terraform {
 }
 
 locals {
-  init_script = file("${path.module}/scripts/initialize.sh")
   manager_tag = "docker-swarm-manager"
-  join_script = templatefile("${path.module}/scripts/join.sh", {
-    manager_tag = local.manager_tag,
-    region = var.region
-  })
 }
 
 data "aws_vpc" "main" {
@@ -78,33 +73,6 @@ resource "aws_ssm_parameter" "swarm_token" {
   }
 }
 
-resource "aws_instance" "swarm_node" {
-  depends_on = [aws_ssm_parameter.swarm_token]
-
-  count                  = var.number_of_nodes
-  ami                    = data.aws_ami.amazon_linux_docker.id
-  instance_type          = "t2.micro"
-  key_name               = aws_key_pair.deployer_key.key_name
-  subnet_id              = data.aws_subnets.main_subnets.ids[
-    count.index % length(data.aws_subnets.main_subnets.ids)
-  ]
-  iam_instance_profile = aws_iam_instance_profile.main_profile.name
-
-  tags                   = {
-    Name = local.manager_tag
-  }
-
-  vpc_security_group_ids = [
-    aws_security_group.swarm_sg.id
-  ]
-
-  lifecycle {
-    ignore_changes = [tags]
-  }
-
-  user_data = count.index == 0 ? local.init_script : local.join_script
-}
-
 resource "null_resource" "wait_for_swarm_ready_tag" {
   provisioner "local-exec" {
     environment = {
@@ -113,7 +81,7 @@ resource "null_resource" "wait_for_swarm_ready_tag" {
     }
     command = "../../scripts/wait_for_swarm_ready_tag.sh"
   }
-  depends_on = [aws_instance.swarm_node]
+  depends_on = [aws_autoscaling_group.main]
 }
 
 resource "null_resource" "swarm_provisioner" {
@@ -126,7 +94,7 @@ resource "null_resource" "swarm_provisioner" {
       PRIVATE_KEY_PATH = var.private_key_path
       SOPS_AGE_KEY_FILE = var.age_key_path
       COMPOSE_FILE_PATH = var.compose_file
-      WEB_REPLICAS = length(aws_instance.swarm_node)
+      WEB_REPLICAS = var.number_of_nodes
     }
     command = "../../scripts/deploy.sh ${var.image_to_deploy}"
   }

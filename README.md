@@ -16,3 +16,12 @@ Ready to run in production? Please [check our deployment guides](https://hexdocs
   * Docs: https://hexdocs.pm/phoenix
   * Forum: https://elixirforum.com/c/phoenix-forum
   * Source: https://github.com/phoenixframework/phoenix
+
+## Finding Instances
+
+    aws ec2 describe-instances --query "Reservations[*].Instances[*].{IP:PublicIpAddress}" --filters "Name=tag:aws:autoscaling:groupName,Values=swarm-asg" "Name=instance-state-name,Values=running" --region us-west-1 --output text | awk '{print "ssh -i ./private_key.pem ec2-user@"$1}'
+
+## Seeding
+
+    docker ps
+    docker exec -ti CONTAINER_ID bin/seed

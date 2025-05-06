@@ -8,7 +8,7 @@ module "swarm" {
   aws_secret_access_key = var.aws_secret_access_key
   gh_pat = var.gh_pat
   gh_owner = "jeg2"
-  image_to_deploy = "ghcr.io/jeg2/kanban:latest"
+  image_to_deploy = "ghcr.io/jeg2/kanban:infrastructure-page"
 }
 
 module "repository_secrets" {
